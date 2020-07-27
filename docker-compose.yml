@@ -1,0 +1,62 @@
+version: "3.3"
+services:
+  pedido:
+    build: 
+      context: pedido/.
+      dockerfile: Dockerfile
+    networks: 
+        - zup
+    image: lnicacio/pedido:latest
+    container_name: pedido-svc
+    hostname: pedido-svc
+    depends_on:
+      - produto
+      - db_pedido
+    entrypoint: ["java","-jar","/usr/app/pedido.jar"]
+    ports:
+      - 8080:8080
+
+  produto:
+    build:
+      context: produto/.
+      dockerfile: Dockerfile
+    networks: 
+        - zup
+    image: lnicacio/produto:latest
+    hostname: produto-svc
+    container_name: produto-svc
+    depends_on:
+      - db_produto
+    entrypoint: ["java","-jar","/usr/app/produto.jar"]
+    ports:
+      - 8081:8081
+
+  db_produto:
+    networks: 
+        - zup
+    image: postgres:latest
+    container_name: postgres-produto
+    hostname: db_produto
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - /opt/db_produto:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  db_pedido:
+    networks: 
+        - zup
+    image: postgres:latest
+    container_name: postgres-pedido
+    hostname: db_pedido
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - /opt/db_pedido:/var/lib/postgresql/data
+    ports:
+      - 5431:5432      
+
+networks: 
+  zup:
+
